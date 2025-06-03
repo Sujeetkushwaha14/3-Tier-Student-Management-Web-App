@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Manager</title>
+  <style>
+    body { font-family: sans-serif; margin: 40px; }
+    input { margin: 5px; padding: 5px; }
+    button { padding: 5px 10px; }
+    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Student Database</h1>
+
+  <h3>Add Student</h3>
+  <input type="number" id="id" placeholder="ID">
+  <input type="text" id="name" placeholder="Name">
+  <input type="number" id="age" placeholder="Age">
+  <button onclick="addStudent()">Add</button>
+
+  <h3>Student List</h3>
+  <button onclick="loadStudents()">Load Students</button>
+  <table id="studentTable">
+    <tr><th>ID</th><th>Name</th><th>Age</th></tr>
+  </table>
+
+  <script>
+    async function loadStudents() {
+      const res = await fetch('http://4.213.50.251:5000/students');
+      const data = await res.json();
+      const table = document.getElementById('studentTable');
+      table.innerHTML = '<tr><th>ID</th><th>Name</th><th>Age</th></tr>';
+      data.forEach(s => {
+        table.innerHTML += `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.age}</td></tr>`;
+      });
+    }
+
+    async function addStudent() {
+      const id = document.getElementById('id').value;
+      const name = document.getElementById('name').value;
+      const age = document.getElementById('age').value;
+
+      const res = await fetch('http://4.213.50.251:5000/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: parseInt(id), name, age: parseInt(age) })
+      });
+
+      const msg = await res.json();
+      alert(msg.message || msg.error);
+      loadStudents();
+    }
+  </script>
+</body>
+</html>
